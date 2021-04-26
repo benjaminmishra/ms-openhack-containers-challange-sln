@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trips-deployment
+  namespace: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: trips
+  strategy:
+    rollingUpdate:
+      maxSurge: 5
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: trips
+    spec:
+      containers:
+      - name: trips
+        image: hacker1fizacr.azurecr.io/trips:v2
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+        env:
+        - 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trips-service
+  namespace: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: trips
